@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Variation Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        #container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 100%;
+        }
+
+        select, input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            width: calc(100% - 20px);
+        }
+
+        .variation-inputs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .variation-input {
+            flex: 1 1 45%;
+            margin: 10px;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <label for="inputImage">Choose Image</label>
+        <input type="file" id="inputImage" accept="image/*">
+
+        <label for="variationType">Choose Variation:</label>
+        <select id="variationType">
+            <option value="original">Original</option>
+            <option value="flipHorizontal">Flip Horizontal</option>
+            <option value="flipVertical">Flip Vertical</option>
+            <option value="rotate">Rotate</option>
+            <option value="scale">Scale</option>
+            <option value="sepia">Sepia</option>
+            <option value="grayscale">Grayscale</option>
+            <option value="negative">Negative</option>
+            <!-- Adicione mais opções conforme necessário -->
+        </select>
+
+        <div class="variation-inputs">
+            <div id="rotationInput" class="variation-input">
+                <label for="rotationDegree">Rotation Degrees:</label>
+                <input type="number" id="rotationDegree" min="-360" max="360" step="1" value="0">
+            </div>
+
+            <div id="scaleInput" class="variation-input">
+                <label for="scaleFactor">Scale Factor:</label>
+                <input type="number" id="scaleFactor" min="0.1" max="5" step="0.1" value="1">
+            </div>
+
+            <div id="brightnessInput" class="variation-input">
+                <label for="brightnessFactor">Brightness Factor:</label>
+                <input type="number" id="brightnessFactor" min="0" max="2" step="0.1" value="1">
+            </div>
+
+            <div id="saturationInput" class="variation-input">
+                <label for="saturationFactor">Saturation Factor:</label>
+                <input type="number" id="saturationFactor" min="0" max="2" step="0.1" value="1">
+            </div>
+
+            <div id="textOverlayInput" class="variation-input">
+                <label for="textOverlay">Text Overlay:</label>
+                <input type="text" id="textOverlay" placeholder="Enter text">
+            </div>
+        </div>
+
+        <button class="btn" onclick="generateVariation()">Generate Variation</button>
+        <button class="btn" onclick="resetImage()">Reset Image</button>
+
+        <div class="canvas-container">
+            <canvas id="originalCanvas" width="400" height="400"></canvas>
+            <canvas id="variationCanvas" width="400" height="400"></canvas>
+        </div>
+
+        <a id="downloadLink" style="display: none">Download Variation</a>
+    </div>
+
+
+    <script>
+        function generateVariation() {
+            // Obter o elemento de entrada de imagem
+            const inputImage = document.getElementById('inputImage');
+
+            // Obter os elementos de canvas
+            const originalCanvas = document.getElementById('originalCanvas');
+            const variationCanvas = document.getElementById('variationCanvas');
+
+            const originalContext = originalCanvas.getContext('2d');
+            const variationContext = variationCanvas.getContext('2d');
+
+            // Limpar os canvases
+            originalContext.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+            variationContext.clearRect(0, 0, variationCanvas.width, variationCanvas.height);
+
+            // Verificar se uma imagem foi carregada
+            if (inputImage.files && inputImage.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+
+                    // Desenhar a imagem original no canvas original
+                    originalContext.drawImage(img, 0, 0, originalCanvas.width, originalCanvas.height);
+
+                    // Obter o tipo de variação selecionado
+                    const variationType = document.getElementById('variationType').value;
+
+                    // Gerar a variação com base no tipo selecionado
+                    switch (variationType) {
+                        case 'original':
+                            drawVariation(variationContext, img, 1, 1, 0, 1, 'Original');
+                            break;
+                        case 'flipHorizontal':
+                            drawVariation(variationContext, img, -1, 1, 0, 1, 'Flip Horizontal');
+                            break;
+                        case 'flipVertical':
+                            drawVariation(variationContext, img, 1, -1, 0, 1, 'Flip Vertical');
+                            break;
+                        case 'rotate':
+                            const rotationDegree = parseFloat(document.getElementById('rotationDegree').value) || 0;
+                            drawVariation(variationContext, img, 1, 1, rotationDegree, 1, `Rotate ${rotationDegree}°`);
+                            break;
+                        case 'scale':
+                            const scaleFactor = parseFloat(document.getElementById('scaleFactor').value) || 1;
+                            drawVariation(variationContext, img, 1, 1, 0, scaleFactor, `Scale ${scaleFactor}`);
+                            break;
+                        case 'sepia':
+                            applySepia(variationContext, img);
+                            break;
+                        case 'grayscale':
+                            applyGrayscale(variationContext, img);
+                            break;
+                        case 'negative':
+                            applyNegative(variationContext, img);
+                            break;
+                        // Adicione mais opções conforme necessário
+                        default:
+                            break;
+                    }
+
+                    // Exibir o link de download
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = variationCanvas.toDataURL('image/png');
+                    downloadLink.download = 'variation.png';
+                    downloadLink.style.display = 'block';
+                };
+
+                reader.readAsDataURL(inputImage.files[0]);
+            }
+        }
+
+        function drawVariation(context, img, scaleX, scaleY, rotationDegree, scaleFactor, label) {
+            context.save();
+            context.translate(context.canvas.width / 2, context.canvas.height / 2);
+            context.rotate((rotationDegree * Math.PI) / 180);
+            context.scale(scaleX, scaleY);
+            context.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
+            context.restore();
+
+            // Adicionar rótulo abaixo da variação
+            context.fillStyle = 'black';
+            context.font = '14px Arial';
+            context.fillText(label, 10, context.canvas.height - 10);
+
+            // Sobreposição de texto
+            const textOverlay = document.getElementById('textOverlay').value;
+            if (textOverlay) {
+                context.fillStyle = 'black';
+                context.font = 'bold 20px Arial';
+                context.fillText(textOverlay, 10, 30);
+            }
+        }
+
+        function applySepia(context, img) {
+            context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+            const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const red = data[i];
+                const green = data[i + 1];
+                const blue = data[i + 2];
+
+                data[i] = Math.min(255, 0.393 * red + 0.769 * green + 0.189 * blue);
+                data[i + 1] = Math.min(255, 0.349 * red + 0.686 * green + 0.168 * blue);
+                data[i + 2] = Math.min(255, 0.272 * red + 0.534 * green + 0.131 * blue);
+            }
+
+            context.putImageData(imageData, 0, 0);
+        }
+
+        function applyGrayscale(context, img) {
+            context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+            const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const average = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = average;
+                data[i + 1] = average;
+                data[i + 2] = average;
+            }
+
+            context.putImageData(imageData, 0, 0);
+        }
+
+        function applyNegative(context, img) {
+            context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+            const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];
+                data[i + 1] = 255 - data[i + 1];
+                data[i + 2] = 255 - data[i + 2];
+            }
+
+            context.putImageData(imageData, 0, 0);
+        }
+
+        // Adicionar função para redefinir a imagem original
+        function resetImage() {
+            const inputImage = document.getElementById('inputImage');
+            inputImage.value = ''; // Limpar o valor do input para permitir carregar a mesma imagem novamente
+            document.getElementById('rotationDegree').value = '0';
+            document.getElementById('scaleFactor').value = '1';
+            document.getElementById('brightnessFactor').value = '1';
+            document.getElementById('saturationFactor').value = '1';
+            document.getElementById('textOverlay').value = '';
+
+            // Ocultar inputs específicos
+            document.getElementById('rotationInput').style.display = 'none';
+            document.getElementById('scaleInput').style.display = 'none';
+            document.getElementById('brightnessInput').style.display = 'none';
+            document.getElementById('saturationInput').style.display = 'none';
+            document.getElementById('textOverlayInput').style.display = 'none';
+
+            generateVariation(); // Regenerar a imagem original
+        }
+
+        // Adicionar lógica para exibir inputs específicos com base no tipo de variação selecionado
+        document.getElementById('variationType').addEventListener('change', function () {
+            const selectedType = this.value;
+
+            // Ocultar todos os inputs
+            document.getElementById('rotationInput').style.display = 'none';
+            document.getElementById('scaleInput').style.display = 'none';
+            document.getElementById('brightnessInput').style.display = 'none';
+            document.getElementById('saturationInput').style.display = 'none';
+            document.getElementById('textOverlayInput').style.display = 'none';
+
+            // Exibir os inputs específicos com base no tipo selecionado
+            if (selectedType === 'rotate') {
+                document.getElementById('rotationInput').style.display = 'block';
+            } else if (selectedType === 'scale') {
+                document.getElementById('scaleInput').style.display = 'block';
+            } else if (selectedType === 'brightness') {
+                document.getElementById('brightnessInput').style.display = 'block';
+            } else if (selectedType === 'saturation') {
+                document.getElementById('saturationInput').style.display = 'block';
+            } else if (selectedType === 'textOverlay') {
+                document.getElementById('textOverlayInput').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

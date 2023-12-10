@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Variation Generator</title>
     <style>
+        
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -82,6 +83,13 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .contrastInput,
+        .cropInput,
+        .noiseInput {
+            display: none;
+        }
+        
     </style>
 </head>
 <body>
@@ -287,6 +295,36 @@
             context.putImageData(imageData, 0, 0);
         }
 
+                // Funções adicionadas...
+        function applyContrast(context, img, contrastFactor) {
+            context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+            const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = contrast(data[i], contrastFactor);
+                data[i + 1] = contrast(data[i + 1], contrastFactor);
+                data[i + 2] = contrast(data[i + 2], contrastFactor);
+            }
+
+            context.putImageData(imageData, 0, 0);
+        }
+
+        function contrast(value, factor) {
+            // Ajuste do contraste utilizando uma fórmula
+            return (value - 128) * factor + 128;
+        }
+
+        function applyCrop(context, img, x, y, width, height) {
+            context.drawImage(img, x, y, width, height, 0, 0, context.canvas.width, context.canvas.height);
+        }
+
+        function applyNoise(context, img, noiseLevel) {
+            // Implemente a lógica para adicionar ruído à imagem
+            // Você pode usar Math.random() para gerar valores aleatórios
+            }
+
         // Adicionar função para redefinir a imagem original
         function resetImage() {
             const inputImage = document.getElementById('inputImage');
@@ -317,6 +355,9 @@
             document.getElementById('brightnessInput').style.display = 'none';
             document.getElementById('saturationInput').style.display = 'none';
             document.getElementById('textOverlayInput').style.display = 'none';
+            document.getElementById('contrastInput').style.display = 'none';
+            document.getElementById('cropInput').style.display = 'none';
+            document.getElementById('noiseInput').style.display = 'none';
 
             // Exibir os inputs específicos com base no tipo selecionado
             if (selectedType === 'rotate') {
@@ -329,8 +370,17 @@
                 document.getElementById('saturationInput').style.display = 'block';
             } else if (selectedType === 'textOverlay') {
                 document.getElementById('textOverlayInput').style.display = 'block';
+
+                
+            } else if (selectedType === 'contrast') {
+                document.getElementById('contrastInput').style.display = 'block';
+            } else if (selectedType === 'crop') {
+                document.getElementById('cropInput').style.display = 'block';
+            } else if (selectedType === 'noise') {
+                document.getElementById('noiseInput').style.display = 'block';
             }
         });
+   
     </script>
 </body>
 </html>

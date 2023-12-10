@@ -1,11 +1,12 @@
+</body>
+</html>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Variation Generator</title>
     <style>
-        
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -83,13 +84,6 @@
         a:hover {
             text-decoration: underline;
         }
-
-        .contrastInput,
-        .cropInput,
-        .noiseInput {
-            display: none;
-        }
-        
     </style>
 </head>
 <body>
@@ -108,6 +102,22 @@
             <option value="grayscale">Grayscale</option>
             <option value="negative">Negative</option>
             <!-- Adicione mais opções conforme necessário -->
+            <option value="invertGrayscale">Invert Grayscale</option>
+            <option value="vibrant">Vibrant</option>
+            <option value="highContrast">High Contrast</option>
+            <option value="blur">Blur</option>
+<option value="pixelate">Pixelate</option>
+<option value="sharpen">Sharpen</option>
+<option value="emboss">Emboss</option>
+<option value="invertColors">Invert Colors</option>
+<option value="sepiaBlur">Sepia Blur</option>
+<option value="greenify">Greenify</option>
+<option value="redTint">Red Tint</option>
+<option value="blueTint">Blue Tint</option>
+<option value="yellowTint">Yellow Tint</option>
+<option value="saturationIncrease">Saturation Increase</option>
+<option value="warmify">Warmify</option>
+
         </select>
 
         <div class="variation-inputs">
@@ -210,14 +220,55 @@
                         // Adicione mais opções conforme necessário
                         default:
                             break;
-                    }
+                            case 'invertGrayscale':
+    applyInvertGrayscale(variationContext, img);
+    break;
+    
+case 'vibrant':
+    applyVibrant(variationContext, img);
+    break;
+case 'highContrast':
+    applyHighContrast(variationContext, img);
+    break;
+    
+    case 'blur':
+    applyBlur(variationContext, img);
+    break;
+case 'pixelate':
+    applyPixelate(variationContext, img);
+    break;
+case 'sharpen':
+    applySharpen(variationContext, img);
+    break;
+case 'emboss':
+    applyEmboss(variationContext, img);
+    break;
+case 'invertColors':
+    applyInvertColors(variationContext, img);
+    break;
+case 'sepiaBlur':
+    applySepiaBlur(variationContext, img);
+    break;
+case 'greenify':
+    applyGreenify(variationContext, img);
+    break;
+case 'redTint':
+    applyTint(variationContext, img, [255, 0, 0]);
+    break;
+case 'blueTint':
+    applyTint(variationContext, img, [0, 0, 255]);
+    break;
+case 'yellowTint':
+    applyTint(variationContext, img, [255, 255, 0]);
+    break;
+case 'saturationIncrease':
+    applySaturationIncrease(variationContext, img);
+    break;
+case 'warmify':
+    applyWarmify(variationContext, img);
+    break;
 
-                                // Validar valores numéricos
-                    const rotationDegree = parseFloat(document.getElementById('rotationDegree').value) || 0;
-                    const scaleFactor = parseFloat(document.getElementById('scaleFactor').value) || 1;
-                    const brightnessFactor = parseFloat(document.getElementById('brightnessFactor').value) || 1;
-                    const saturationFactor = parseFloat(document.getElementById('saturationFactor').value) || 1;
-                                                                      
+                    }
 
                     // Exibir o link de download
                     const downloadLink = document.getElementById('downloadLink');
@@ -251,6 +302,202 @@
                 context.fillText(textOverlay, 10, 30);
             }
         }
+
+function applyInvertGrayscale(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const average = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        data[i] = 255 - average;
+        data[i + 1] = 255 - average;
+        data[i + 2] = 255 - average;
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyVibrant(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = Math.min(255, data[i] * 1.5);
+        data[i + 1] = Math.min(255, data[i + 1] * 1.5);
+        data[i + 2] = Math.min(255, data[i + 2] * 1.5);
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyHighContrast(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const average = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        const intensity = average > 128 ? 255 : 0;
+        data[i] = intensity;
+        data[i + 1] = intensity;
+        data[i + 2] = intensity;
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyBlur(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const pixelValue = (data[i] + data[i + 1] + data[i + 2]) / 3;
+        data[i] = pixelValue;
+        data[i + 1] = pixelValue;
+        data[i + 2] = pixelValue;
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyPixelate(context, img) {
+    const pixelSize = 10; // Adjust the pixel size as needed
+
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let y = 0; y < context.canvas.height; y += pixelSize) {
+        for (let x = 0; x < context.canvas.width; x += pixelSize) {
+            const startIndex = (y * context.canvas.width + x) * 4;
+
+            const red = data[startIndex];
+            const green = data[startIndex + 1];
+            const blue = data[startIndex + 2];
+
+            for (let i = 0; i < pixelSize; i++) {
+                for (let j = 0; j < pixelSize; j++) {
+                    const currentIndex = ((y + i) * context.canvas.width + (x + j)) * 4;
+                    data[currentIndex] = red;
+                    data[currentIndex + 1] = green;
+                    data[currentIndex + 2] = blue;
+                }
+            }
+        }
+    }
+    
+        context.putImageData(imageData, 0, 0);
+}
+    
+    function applySharpen(context, img) {
+    const sharpenMatrix = [
+        [0, -1, 0],
+        [-1, 5, -1],
+        [0, -1, 0]
+    ];
+
+    applyConvolution(context, img, sharpenMatrix);
+}
+
+function applyEmboss(context, img) {
+    const embossMatrix = [
+        [-2, -1, 0],
+        [-1, 1, 1],
+        [0, 1, 2]
+    ];
+
+    applyConvolution(context, img, embossMatrix);
+}
+
+function applyInvertColors(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = 255 - data[i];         // Red
+        data[i + 1] = 255 - data[i + 1]; // Green
+        data[i + 2] = 255 - data[i + 2]; // Blue
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applySepiaBlur(context, img) {
+    applySepia(context, img);
+    applyBlur(context, img);
+}
+
+function applyGreenify(context, img) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i + 1] += 50; // Increase green channel
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyTint(context, img, tintRGB) {
+    context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] += tintRGB[0];     // Red
+        data[i + 1] += tintRGB[1]; // Green
+        data[i + 2] += tintRGB[2]; // Blue
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applySaturationIncrease(context, img) {
+    const saturationFactor = 1.5;
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        const hsv = rgbToHsv(data[i], data[i + 1], data[i + 2]);
+        hsv[1] *= saturationFactor; // Increase saturation
+        const rgb = hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+        data[i] = rgb[0];
+        data[i + 1] = rgb[1];
+        data[i + 2] = rgb[2];
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+function applyWarmify(context, img) {
+    const warmthFactor = 1.2;
+
+    const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = Math.min(255, data[i] * warmthFactor); // Adjust red channel
+    }
+
+    context.putImageData(imageData, 0, 0);
+}
+
+
 
         function applySepia(context, img) {
             context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
@@ -302,36 +549,6 @@
             context.putImageData(imageData, 0, 0);
         }
 
-                // Funções adicionadas...
-        function applyContrast(context, img, contrastFactor) {
-            context.drawImage(img, 0, 0, context.canvas.width, context.canvas.height);
-
-            const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
-            const data = imageData.data;
-
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = contrast(data[i], contrastFactor);
-                data[i + 1] = contrast(data[i + 1], contrastFactor);
-                data[i + 2] = contrast(data[i + 2], contrastFactor);
-            }
-
-            context.putImageData(imageData, 0, 0);
-        }
-
-        function contrast(value, factor) {
-            // Ajuste do contraste utilizando uma fórmula
-            return (value - 128) * factor + 128;
-        }
-
-        function applyCrop(context, img, x, y, width, height) {
-            context.drawImage(img, x, y, width, height, 0, 0, context.canvas.width, context.canvas.height);
-        }
-
-        function applyNoise(context, img, noiseLevel) {
-            // Implemente a lógica para adicionar ruído à imagem
-            // Você pode usar Math.random() para gerar valores aleatórios
-            }
-
         // Adicionar função para redefinir a imagem original
         function resetImage() {
             const inputImage = document.getElementById('inputImage');
@@ -362,9 +579,6 @@
             document.getElementById('brightnessInput').style.display = 'none';
             document.getElementById('saturationInput').style.display = 'none';
             document.getElementById('textOverlayInput').style.display = 'none';
-            document.getElementById('contrastInput').style.display = 'none';
-            document.getElementById('cropInput').style.display = 'none';
-            document.getElementById('noiseInput').style.display = 'none';
 
             // Exibir os inputs específicos com base no tipo selecionado
             if (selectedType === 'rotate') {
@@ -377,17 +591,8 @@
                 document.getElementById('saturationInput').style.display = 'block';
             } else if (selectedType === 'textOverlay') {
                 document.getElementById('textOverlayInput').style.display = 'block';
-
-                
-            } else if (selectedType === 'contrast') {
-                document.getElementById('contrastInput').style.display = 'block';
-            } else if (selectedType === 'crop') {
-                document.getElementById('cropInput').style.display = 'block';
-            } else if (selectedType === 'noise') {
-                document.getElementById('noiseInput').style.display = 'block';
             }
         });
-   
     </script>
 </body>
 </html>

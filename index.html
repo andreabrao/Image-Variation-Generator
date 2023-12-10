@@ -212,6 +212,13 @@
                             break;
                     }
 
+                                // Validar valores numéricos
+                    const rotationDegree = parseFloat(document.getElementById('rotationDegree').value) || 0;
+                    const scaleFactor = parseFloat(document.getElementById('scaleFactor').value) || 1;
+                    const brightnessFactor = parseFloat(document.getElementById('brightnessFactor').value) || 1;
+                    const saturationFactor = parseFloat(document.getElementById('saturationFactor').value) || 1;
+                                                                      
+
                     // Exibir o link de download
                     const downloadLink = document.getElementById('downloadLink');
                     downloadLink.href = variationCanvas.toDataURL('image/png');
